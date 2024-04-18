@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { ArrowRightComponent } from '../../icons/arrow-right/arrow-right.component';
 import { SparkleComponent } from '../../icons/sparkle/sparkle.component';
-import { Router } from 'express';
+import { Router } from '@angular/router';
+
+
 
 @Component({
   selector: 'app-home',
@@ -15,11 +17,10 @@ import { Router } from 'express';
 })
 export class HomeComponent {
 
-  constructor(private router: Router){
-
+  constructor(private router: Router) {
   }
 
-  openChat(){
-    this.router.navigate(["chat"])
+  openChat() {
+    this.router.navigate(["chat"]);
   }
 }
