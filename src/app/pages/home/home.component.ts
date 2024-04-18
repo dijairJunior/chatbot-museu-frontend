@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { ArrowRightComponent } from '../../icons/arrow-right/arrow-right.component';
 import { SparkleComponent } from '../../icons/sparkle/sparkle.component';
 import { Router } from 'express';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
