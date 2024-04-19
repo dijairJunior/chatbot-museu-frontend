@@ -14,9 +14,14 @@
 
     </header>
 
-    <section class="chat">
+    <section class="chat-content">
 
-        <chat-suggestions></chat-suggestions>
+        <chat-suggestions 
+        (questionSelected)="sendSuggestedQuestion($event)"
+        *ngIf="messages.length < 1">
+        </chat-suggestions>
+
+        <chat-dialog [messages]="messages"></chat-dialog>
 
     </section>
 </main>
