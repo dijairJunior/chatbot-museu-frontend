@@ -42,47 +42,47 @@ export class ChatComponent {
     })
   }
 
-    constructor(private service: MessageService) {
-      this.chatForm = new FormGroup({
-        message: new FormControl('', [Validators.required])
-      });
-    }
+  constructor(private service: MessageService) {
+    this.chatForm = new FormGroup({
+      message: new FormControl('', [Validators.required])
+    });
+  }
 
-    ngAfterViewInit(): void {
-      if (typeof localStorage !== 'undefined') {
-        this.messages = JSON.parse(localStorage.getItem("messages") ?? "[]");
+  ngAfterViewInit(): void {
+    if (typeof localStorage !== 'undefined') {
+      this.messages = JSON.parse(localStorage.getItem("messages") ?? "[]");
+    }
+  }
+
+  updateLocalStoarage() {
+    localStorage.setItem("messages", JSON.stringify(this.messages))
+  }
+
+  submit() {
+    this.sendNewMessage(this.chatForm.value.message);
+    this.chatForm.reset();
+  }
+
+  sendNewMessage(question: string) {
+    this.messages.push({
+      type: 'request',
+      message: question
+    })
+
+    this.updateLocalStoarage()
+    this.sendMessage(question)
+  }
+
+  sendMessage(message: string) {
+    this.service.send(message).subscribe({
+      next: (body) => {
+        this.messages.push({
+          type: "response",
+          message: body.response
+        })
+        this.updateLocalStoarage()
       }
-    }
+    })
+  }
 
-    updateLocalStoarage() {
-      localStorage.setItem("messages", JSON.stringify(this.messages))
-    }
-
-    submit(){
-      this.sendNewMessage(this.chatForm.value.message);
-      this.chatForm.reset();
-    }
-
-    sendNewMessage(question: string){
-      this.messages.push({
-        type: 'request',
-        message: question
-      })
-
-      this.updateLocalStoarage()
-      this.sendMessage(question)
-    }
-
-    sendMessage(message: string) {
-      this.service.send(message).subscribe({
-        next: (body) => {
-          this.messages.push({
-            type: "response",
-            message: body.response
-          })
-          this.updateLocalStoarage()
-        }
-      })
-    }
-  
 }
