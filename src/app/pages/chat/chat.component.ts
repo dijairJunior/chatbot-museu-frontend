@@ -7,6 +7,8 @@ import { Message } from '../../types/message.type';
 import { ChatDialogComponent } from '../../components/chat-dialog/chat-dialog.component';
 import { MessageService } from '../../services/message.service';
 import { HttpClientModule } from '@angular/common/http';
+import { SendComponent } from '../../icons/send/send.component';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-chat',
@@ -15,8 +17,10 @@ import { HttpClientModule } from '@angular/common/http';
     CommonModule,
     MuseumComponent,
     ArrowLeftComponent,
+    SendComponent,
     ChatSuggestionsComponent,
-    ChatDialogComponent
+    ChatDialogComponent,
+    ReactiveFormsModule
   ],
 
   providers: [
@@ -28,33 +32,57 @@ import { HttpClientModule } from '@angular/common/http';
 })
 
 export class ChatComponent {
-  messages: Message[] = JSON.parse(localStorage.getItem("messages") ?? "[]")
+  messages: Message[] = [];
+  chatForm!: FormGroup;
 
-  constructor(private service: MessageService) {}
-
-  updateLocalStoarage() {
-    localStorage.setItem("messages", JSON.stringify(this.messages))
-  }
-
-  sendSuggestedQuestion(question: string){
+  sendSuggested(question: string) {
     this.messages.push({
       type: 'request',
       message: question
     })
+  }
 
-    this.updateLocalStoarage()
-    this.sendMessage(question)
-  }
-  
-  sendMessage(message: string) {
-    this.service.send(message).subscribe({
-      next: (body) => {
-        this.messages.push({
-          type: "response",
-          message: body.response
-        })
-        this.updateLocalStoarage()
+    constructor(private service: MessageService) {
+      this.chatForm = new FormGroup({
+        message: new FormControl('', [Validators.required])
+      });
+    }
+
+    ngAfterViewInit(): void {
+      if (typeof localStorage !== 'undefined') {
+        this.messages = JSON.parse(localStorage.getItem("messages") ?? "[]");
       }
-    })
-  }
+    }
+
+    updateLocalStoarage() {
+      localStorage.setItem("messages", JSON.stringify(this.messages))
+    }
+
+    submit(){
+      this.sendNewMessage(this.chatForm.value.message);
+      this.chatForm.reset();
+    }
+
+    sendNewMessage(question: string){
+      this.messages.push({
+        type: 'request',
+        message: question
+      })
+
+      this.updateLocalStoarage()
+      this.sendMessage(question)
+    }
+
+    sendMessage(message: string) {
+      this.service.send(message).subscribe({
+        next: (body) => {
+          this.messages.push({
+            type: "response",
+            message: body.response
+          })
+          this.updateLocalStoarage()
+        }
+      })
+    }
+  
 }
